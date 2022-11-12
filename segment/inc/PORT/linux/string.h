@@ -32,6 +32,9 @@ __BEGIN_DECLS
 #define	__need_NULL
 #include <stddef.h>
 
+#define __BEGIN_NAMESPACE_STD
+#define __END_NAMESPACE_STD
+
 
 __BEGIN_NAMESPACE_STD
 /* Copy N bytes of SRC to DEST.  */

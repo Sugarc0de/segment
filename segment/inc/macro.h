@@ -74,7 +74,7 @@
 #define	assert(expr)		if (! (expr)) bug("assertion \"expr\" failed")
 #endif
 #if CC_NOBCOPY
-#define	bcopy(from, to, n)	( (void) memcpy(to, from, n) )
+//#define	bcopy(from, to, n)	( (void) memcpy(to, from, n) )
 #else
 extern void     bcopy();
 #endif
@@ -83,7 +83,7 @@ extern void     bcopy();
 #define	bit(i)			( 1 << (i) )
 #define	bug(s)			_bug(s, __FILE__, __LINE__)
 #if CC_NOBZERO
-#define	bzero(p, n)		( (void) memset(p, 0, n) )
+//#define	bzero(p, n)		( (void) memset(p, 0, n) )
 #else
 extern void     bzero();
 #endif
