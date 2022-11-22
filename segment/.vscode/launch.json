@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/segment",
+            "args": ["-t", "10", "-m", "0.1", "-n", "15,15,100,2500,2500", "-o", "/home/yye/first_project/canadian_landsat_2021/elaine_study_area/elaine_study_area/tiled_data/tile1/results/trial_2", 
+        "/home/yye/first_project/canadian_landsat_2021/elaine_study_area/elaine_study_area/tiled_data/tile1/proxy_tile1_8bit.bip"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
