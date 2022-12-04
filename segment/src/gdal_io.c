@@ -95,15 +95,22 @@ GDAL_write_image(Seg_proc Spr, char *fname)
 
     // Write out
     int l;
+    int c;
     for (l = 0; l < Spr->nlines; l++) {
-        err = GDALRasterIO(hBand, GF_Write,
-                           0, l, Spr->nsamps, 1,
-                           Spr->rband[l],
-                           Spr->nsamps * nbytes, 1,
-                           eBufType,
-                           0, 0);
-        if (err != CE_None) {
-            error("Error writing output file %s (line %d)\n", fname, l);
+        for (c = 0; c < Spr->nsamps; c++) {
+            printf("Writing line %i column %i\n", l, c);
+            fflush(stdout);
+
+            err = GDALRasterIO(hBand, GF_Write,
+                               c, l, 1, 1,
+                               &Spr->rband[l][c],
+                               nbytes, 1,
+                               eBufType,
+                               0, 0);
+
+            if (err != CE_None) {
+                error("Error writing output file %s (line %d)\n", fname, l);
+            }
         }
     }
 
