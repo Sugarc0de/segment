@@ -98,8 +98,8 @@ GDAL_write_image(Seg_proc Spr, char *fname)
     int c;
     for (l = 0; l < Spr->nlines; l++) {
         for (c = 0; c < Spr->nsamps; c++) {
-            printf("Writing line %i column %i\n", l, c);
-            fflush(stdout);
+            // printf("Writing line %i column %i\n", l, c);
+            // fflush(stdout);
 
             err = GDALRasterIO(hBand, GF_Write,
                                c, l, 1, 1,
@@ -182,10 +182,11 @@ GDAL_process_headers(Seg_proc Spr)
         if (GDALGetRasterCount(hDataset) != 1)
             error("Input mask image must have 1 band");
         hBand = GDALGetRasterBand(hDataset, 1);
-        if (GDALGetDataTypeName(GDALGetRasterDataType(hBand)) != "Byte")
+        const char *type_m = GDALGetDataTypeName(GDALGetRasterDataType(hBand));
+        if (strcmp(type_m, "Byte") != 0)
             error("The mask image is not 1 byte per pixel");
 
-        Spr->imask = GDAL_read_image(Spr->mask_fn);
+        Spr->imask = GDAL_read_image(hDataset);
 
         GDALClose(hDataset);
 

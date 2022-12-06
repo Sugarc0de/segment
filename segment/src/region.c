@@ -828,7 +828,7 @@ float           dist2;
     REG_1 int       index;
 
     index = dist2 / binwidth2;
-    if (index > N_DHISTBINS)
+    if (index > N_DHISTBINS || index < 0)
         index = N_DHISTBINS;
     dhbin[index]++;
 }

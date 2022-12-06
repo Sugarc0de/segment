@@ -533,7 +533,8 @@ char          **argv;
     char *mask_fn = "";
     if (got_opt(opt_M)) {
         printf("Got mask argument.\n");
-        mask_fn = (char *)malloc(sizeof(char) * strlen(str_arg(opt_M, 0)));
+        int mlen = strlen(str_arg(opt_M, 0));
+        mask_fn = (char *)malloc(sizeof(char) * (mlen + 1));
         strcpy(mask_fn, str_arg(opt_M, 0));
         sf_set(&sproc, SF_MASK);
     }
