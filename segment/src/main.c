@@ -173,7 +173,9 @@
 **  -A  produce a region map mask image to mark auxiliary merges
 **  -M  mask image
 **      -h      output contiguity band and region table for hsegment
-**
+**  -S  skip step, if followed by a path, we should read from that and skip to 
+**      auxilliary step directly. If not, we should perform normal step from 
+**      input image and save without the auxilliary step. 
 ** EXAMPLES
 **
 ** FILES
@@ -302,6 +304,14 @@ char          **argv;
         "image",
         OPTIONAL, 1, 1
     };
+    
+    static OPTION_T opt_S = {
+        'S',
+        "skip step",
+        STR_OPTARGS,
+        "skip step",
+        OPTIONAL, 1, 1
+    };
 
     static OPTION_T *optv[] = {
         &opt_t,
@@ -316,6 +326,7 @@ char          **argv;
         &opt_A,
         &opt_h,
         &opt_M,
+        &opt_S,
         &operands,
         0
     };
@@ -358,6 +369,7 @@ char          **argv;
     sproc.nviable = sproc.nmax = sproc.nabsmax = MAX_USHORT;
     sproc.nblow = 0.0;
     sproc.nbhigh = 255.0;
+    sproc.skip_file = NULL;
 
     /*
      * 4-way or 8-way neighbors?
@@ -470,6 +482,14 @@ char          **argv;
     }
     if (got_opt(opt_h)) {
         sf_set(&sproc, SF_HSEG);
+    }
+    
+    if (got_opt(opt_S)) {
+        printf("Got skip file argument.\n");
+        int slen = strlen(str_arg(opt_S, 0));
+        sproc.skip_file = (char *)malloc(sizeof(char) * (slen + 1));
+        strcpy(sproc.skip_file, str_arg(opt_S, 0));
+        printf("%s\n", sproc.skip_file);
     }
 
     /*

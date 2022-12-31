@@ -141,6 +141,8 @@ typedef struct {
     long            reclaim_trigger;	/* # of unused regions in current
     					 *  region list necessary to trigger
     					 *  garbage collection */
+    char           *skip_file          /* filename to be read directly for 
+                         Step 2, if equal to placeholder, skip step 2*/
 }               seg_proc, *Seg_proc;
 
 /*

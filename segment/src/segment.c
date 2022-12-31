@@ -676,6 +676,10 @@ Seg_proc        Spr;
     printf("Normal segmentation completed in %d passes\n", Spr->pass);
     if (Spr->nnormin == 1)
         exit(0);
+        
+    if (Spr->skip_file != NULL && strcmp(Spr->skip_file, "breakpoint") == 0) {
+        exit(0);
+    }
 
     printf("Starting auxiliary passes to guarantee normal regions have at least\n");
     printf("    %d pixels\n", Spr->nnormin);
@@ -712,7 +716,9 @@ Seg_proc        Spr;
 #ifdef DEBUG
         check_region_band(Spr);
 #endif              /* DEBUG */
-        log_apass(Spr);
+        if (Spr->skip_file == NULL) {
+            log_apass(Spr);
+        }
         if (Spr->maxreg - Spr->nreg >= Spr->reclaim_trigger) {
             printf("\nGarbage collecting region list\n");
             compact_region_list(Spr);
