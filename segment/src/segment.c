@@ -678,6 +678,16 @@ Seg_proc        Spr;
         exit(0);
         
     if (Spr->skip_file != NULL && strcmp(Spr->skip_file, "breakpoint") == 0) {
+        FILE *outfile;
+        // open file for writing
+        outfile = fopen("spr.dat", "w");
+        if (outfile == NULL)
+        {
+            fprintf(stderr, "\nError opened file\n");
+            exit (1);
+        }
+        fwrite(Spr->nnbrlist, sizeof(Neighbor), Spr->nreg, outfile);
+        fclose(outfile);
         exit(0);
     }
 
