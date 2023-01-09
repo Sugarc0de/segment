@@ -167,8 +167,23 @@ int             m_fd;
     printf("About to perform first general pass over region list\n\n");
     fflush(stdout);
 
-    main_loop(Spr);
-
+    if (Spr->skip_file != NULL && strcmp(Spr->skip_file, "breakpoint") != 0) {
+        char *temp_file = (char *) malloc(20 * sizeof(char));
+        strcpy(temp_file, Spr->skip_file);
+        char *token = strtok(temp_file, "_");
+        token = strtok(NULL, "_");
+        int nreg = atoi(token);
+        printf("Number of region is %d\n", nreg);
+        free(temp_file);
+        FILE * fp;
+        fp = fopen(Spr->skip_file, "rb");
+        for (int r = 0; r < nreg; ++r) {
+            fread(&Spr->nnbrlist[r], sizeof(Neighbor), 1, fp);
+        }
+        fclose(fp);
+    } else {
+        main_loop(Spr);
+    }
     wind_up(Spr);
 }
 
@@ -679,12 +694,16 @@ Seg_proc        Spr;
         
     if (Spr->skip_file != NULL && strcmp(Spr->skip_file, "breakpoint") == 0) {
         FILE *outfile;
-        // open file for writing
-        outfile = fopen("spr.dat", "w");
+        char filename[20];
+        char buffer[10];
+        sprintf(buffer, "%d", Spr->nreg);
+        strcpy(filename, "spr_");
+        (void) strcat(filename, buffer);
+        outfile = fopen(filename, "w");
         if (outfile == NULL)
         {
             fprintf(stderr, "\nError opened file\n");
-            exit (1);
+            exit(1);
         }
         fwrite(Spr->nnbrlist, sizeof(Neighbor), Spr->nreg, outfile);
         fclose(outfile);
