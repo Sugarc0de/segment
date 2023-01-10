@@ -745,7 +745,7 @@ Seg_proc        Spr;
 #ifdef DEBUG
         check_region_band(Spr);
 #endif              /* DEBUG */
-        if (Spr->skip_file == NULL) {
+        if (Spr->skip_file == NULL || strcmp(Spr->skip_file, "breakpoint") != 0) {
             log_apass(Spr);
         }
         if (Spr->maxreg - Spr->nreg >= Spr->reclaim_trigger) {
