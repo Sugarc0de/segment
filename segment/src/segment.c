@@ -180,7 +180,45 @@ int             m_fd;
         for (int r = 0; r < nreg; ++r) {
             fread(&Spr->nnbrlist[r], sizeof(Neighbor), 1, fp);
         }
+        for (int r = 0; r < nreg; ++r) {
+            fread(&Spr->rlist[r], sizeof(Region), 1, fp);
+        }
+        for (int r = 0; r < nreg; ++r) {
+            fread(&Spr->ctrlist[r], sizeof(float), 1, fp);
+        }
+        for (int l = 0; l < Spr->nlines; l++) {
+            for (int s = 0; s < Spr->nsamps; s++) {
+                fread(&Spr->rband[l][s], sizeof(REGION_ID), 1, fp);
+                fread(&Spr->cband[l][s], sizeof(cd_map), 1, fp);
+            }
+        }
+        for (int l = 0; l < 20; l++) {
+            for (int s = 0; s < 20; s++) {
+                printf("rband Region Id: %zu \n", Spr->rband[l][s]);
+            }
+        }
+        for (int l = 0; l < 20; l++) {
+            for (int s = 0; s < 20; s++) {
+                printf("cband Region Id: %zu \n", Spr->cband[l][s]);
+            }
+        }
+        fread(&Spr->dmin2, sizeof(float), 1, fp);
+        fread(&Spr->nnbr_gone, sizeof(long), 1, fp);
+        fread(&Spr->merge_attempts, sizeof(long), 1, fp);
+        fread(&Spr->special_merge_attempts, sizeof(long), 1, fp);
+        fread(&Spr->wrong_partner, sizeof(long), 1, fp);
+        fread(&Spr->nnbr_d2_big, sizeof(long), 1, fp);
+        fread(&Spr->npix_big, sizeof(long), 1, fp);
+        fread(&Spr->both_viable, sizeof(long), 1, fp);
+        fread(&Spr->no_nbr, sizeof(long), 1, fp);
+        fread(&Spr->merging, sizeof(long), 1, fp);
+        fread(&Spr->maxpix, sizeof(int), 1, fp);
+        fread(&Spr->pass, sizeof(int), 1, fp);
         fclose(fp);
+        Spr->nreg = nreg;
+        Spr->maxreg = nreg;
+        Spr->ntols = -1;
+        Spr->sflags = 0;
     } else {
         main_loop(Spr);
     }
@@ -706,6 +744,26 @@ Seg_proc        Spr;
             exit(1);
         }
         fwrite(Spr->nnbrlist, sizeof(Neighbor), Spr->nreg, outfile);
+        fwrite(Spr->rlist, sizeof(Region), Spr->nreg, outfile);
+        fwrite(Spr->ctrlist, sizeof(float), Spr->nreg, outfile);
+        for (int l = 0; l < Spr->nlines; l++) {
+            for (int s = 0; s < Spr->nsamps; s++) {
+                fwrite(&Spr->rband[l][s], sizeof(REGION_ID), 1, outfile);
+                fwrite(&Spr->cband[l][s], sizeof(cd_map), 1, outfile);
+            }
+        }
+        fwrite(&Spr->dmin2, sizeof(float), 1, outfile);
+        fwrite(&Spr->nnbr_gone, sizeof(long), 1, outfile);
+        fwrite(&Spr->merge_attempts, sizeof(long), 1, outfile);
+        fwrite(&Spr->special_merge_attempts, sizeof(long), 1, outfile);
+        fwrite(&Spr->wrong_partner, sizeof(long), 1, outfile);
+        fwrite(&Spr->nnbr_d2_big, sizeof(long), 1, outfile);
+        fwrite(&Spr->npix_big, sizeof(long), 1, outfile);
+        fwrite(&Spr->both_viable, sizeof(long), 1, outfile);
+        fwrite(&Spr->no_nbr, sizeof(long), 1, outfile);
+        fwrite(&Spr->merging, sizeof(long), 1, outfile);
+        fwrite(&Spr->maxpix, sizeof(int), 1, outfile);
+        fwrite(&Spr->pass, sizeof(int), 1, outfile);
         fclose(outfile);
         exit(0);
     }
