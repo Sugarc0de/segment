@@ -1,3 +1,5 @@
+#define DEBUG
+
 #ifndef lint
 static char     SCCS_ID[] = "region.c 2.10  9/5/94";
 
@@ -423,6 +425,7 @@ REG_1 Seg_proc  Spr;
      */
     for (r = 1; r <= Spr->maxreg; r++) {
         R = &regid_to_reg(Spr, r);
+
         if (!rf_get(R, RF_ACTIVE))  /* Is this region inactive? */
             continue;       /* Yes. Skip it. */
         rf_unset(&regid_to_reg(Spr, r), RF_MERGE);  /* Clear merge flag */
@@ -950,4 +953,3 @@ REG_1 Seg_proc  Spr;
         error("Terminating with inconsistent region map");
 }
 #endif DEBUG
-

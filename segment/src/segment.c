@@ -1,3 +1,5 @@
+#define DEBUG
+
 #ifndef lint
 static char     SCCS_ID[] = "segment.c 2.14  9/5/94";
 #endif
@@ -25,6 +27,7 @@ static void     wr_cband();
 static void     wr_rlist();
 static void     wr_armm();
 static void     report_small_regions();
+static void     get_rlist();
 
 
 void
@@ -688,6 +691,17 @@ Seg_proc        Spr;
     fflush(stdout);
     old_nreg = 0;
 
+     /*
+     * Elaine: Read from base file to get rlist and rband 
+     */
+    char rlfname2[] = "elaine_test.rlist.51";
+    get_rlist(Spr, rlfname2);
+
+    // Spr->nnbrlist = (Neighbor) LINT_CAST(realloc((char *) Spr->nnbrlist,
+    //                                      (unsigned) (Spr->nreg + 1) * sizeof(neighbor)));
+    // if (Spr->nnbrlist == NULL)
+    //     error("Realloc failed for neighbor list");
+
     if (sf_get(Spr, SF_ARMM)) {
         int             l;
         int             s;
@@ -845,5 +859,57 @@ Seg_proc        Spr;
                    R->uleft.x, R->uleft.y,
                    R->lright.x, R->lright.y);
         }
+    }
+}
+
+static void
+get_rlist(Spr, rlfname)
+Seg_proc        Spr;
+char            *rlfname;
+{
+    int             rfd;
+    REG_2 long      r;
+    reglist         rl;
+    Region          R;
+    int             size;
+
+    if ((rfd = uropen(rlfname)) == ERROR) {
+        error("can't open region list file %s\n", rlfname);
+    }
+    if (uread(rfd, (addr_t) & rl, sizeof(reglist)) == ERROR) {
+        error("read failed on region list file header");
+    }
+    printf("Elaine -- read from region list file\n");
+    printf("Elaine -- rl has nlines: %d, nsamps: %d, nbands: %d, nreg: %ld\n", 
+    rl.nlines, rl.nsamps, rl.nbands, rl.nreg);
+    assert(rl.nlines == Spr->nlines);
+    assert(rl.nsamps == Spr->nsamps);
+    // Elaine: we might pass different bands for step 2 so this assertion will break.
+    assert(rl.nbands == Spr->nbands); 
+    Spr->nreg = rl.nreg;
+    Spr->maxreg = rl.nreg;
+    size = Spr->nbands * sizeof(float);
+
+    // Spr->rlist = (Region) LINT_CAST(realloc((char *) Spr->rlist,
+    //                                         (unsigned) (Spr->nreg + 2) * sizeof(region)));
+    // if (Spr->rlist == NULL)
+    //     error("Realloc failed for region list");
+
+    // Spr->ctrlist = (float *) LINT_CAST(realloc((char *) Spr->ctrlist,
+    //                                    (unsigned) (Spr->nreg + 2) * Spr->nbands * sizeof(float)));
+    // if (Spr->ctrlist == NULL)
+    //     error("Realloc failed for centroid list");
+
+    for (r = 1; r <= Spr->nreg; r++) {
+        R = &regid_to_reg(Spr, r);
+        if (uread(rfd, (addr_t) R, sizeof(region)) == ERROR)
+            error("read failed on region list, region #%ld", r);
+        assert(rf_get(R, RF_ACTIVE));
+        if (uread(rfd, (addr_t) regid_to_Ctr(Spr, r), size) == ERROR)
+            error("read failed on region list, region #%ld", r);
+    }
+
+    if (uclose(rfd) == ERROR) {
+        error("can't close the region list file\n");
     }
 }
