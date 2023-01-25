@@ -692,15 +692,11 @@ Seg_proc        Spr;
     old_nreg = 0;
 
      /*
-     * Elaine: Read from base file to get rlist and rband 
+     * Elaine: Read from base file to get rlist and rband
+     * TODO: Need to test whether this is correct if using a different input image during step 2
      */
-    char rlfname2[] = "elaine_test.rlist.51";
+    char rlfname2[] = "test.rlist.51";
     get_rlist(Spr, rlfname2);
-
-    // Spr->nnbrlist = (Neighbor) LINT_CAST(realloc((char *) Spr->nnbrlist,
-    //                                      (unsigned) (Spr->nreg + 1) * sizeof(neighbor)));
-    // if (Spr->nnbrlist == NULL)
-    //     error("Realloc failed for neighbor list");
 
     if (sf_get(Spr, SF_ARMM)) {
         int             l;
@@ -889,16 +885,6 @@ char            *rlfname;
     Spr->nreg = rl.nreg;
     Spr->maxreg = rl.nreg;
     size = Spr->nbands * sizeof(float);
-
-    // Spr->rlist = (Region) LINT_CAST(realloc((char *) Spr->rlist,
-    //                                         (unsigned) (Spr->nreg + 2) * sizeof(region)));
-    // if (Spr->rlist == NULL)
-    //     error("Realloc failed for region list");
-
-    // Spr->ctrlist = (float *) LINT_CAST(realloc((char *) Spr->ctrlist,
-    //                                    (unsigned) (Spr->nreg + 2) * Spr->nbands * sizeof(float)));
-    // if (Spr->ctrlist == NULL)
-    //     error("Realloc failed for centroid list");
 
     for (r = 1; r <= Spr->nreg; r++) {
         R = &regid_to_reg(Spr, r);
