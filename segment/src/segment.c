@@ -1,5 +1,3 @@
-#define DEBUG
-
 #ifndef lint
 static char     SCCS_ID[] = "segment.c 2.14  9/5/94";
 #endif
@@ -695,8 +693,9 @@ Seg_proc        Spr;
      * Elaine: Read from base file to get rlist and rband
      * TODO: Need to test whether this is correct if using a different input image during step 2
      */
-    char rlfname2[] = "test.rlist.51";
-    get_rlist(Spr, rlfname2);
+    char rlfname2[] = "/home/yye/first_project/processed_data/landsat/bc/Mosaic_proxy_2000_small/results/step1.rlist.5";
+    char cfname2[] = "/home/yye/first_project/processed_data/landsat/bc/Mosaic_proxy_2000_small/results/step1.cband.5";
+    get_rlist(Spr, rlfname2, cfname2);
 
     if (sf_get(Spr, SF_ARMM)) {
         int             l;
@@ -859,11 +858,13 @@ Seg_proc        Spr;
 }
 
 static void
-get_rlist(Spr, rlfname)
+get_rlist(Spr, rlfname, cfname)
 Seg_proc        Spr;
 char            *rlfname;
+char            *cfname;
 {
     int             rfd;
+    int             cfd;
     REG_2 long      r;
     reglist         rl;
     Region          R;
@@ -880,10 +881,44 @@ char            *rlfname;
     rl.nlines, rl.nsamps, rl.nbands, rl.nreg);
     assert(rl.nlines == Spr->nlines);
     assert(rl.nsamps == Spr->nsamps);
+
+    if ((cfd = uropen(cfname)) == ERROR) {
+        error("can't open contiguity band file %s\n", cfname);
+    }
+    for (int l = 0; l < Spr->nlines; l++) {
+        if (uread(cfd, (addr_t) Spr->cband[l], Spr->nsamps) == ERROR) {
+            error("read failed on contiguity band file, line %d", l);
+        }
+    }
+
+    if (uclose(cfd) == ERROR) {
+        error("can't close the contiguity band file\n");
+    }
+
     // Elaine: we might pass different bands for step 2 so this assertion will break.
-    assert(rl.nbands == Spr->nbands); 
+    // assert(rl.nbands == Spr->nbands); 
+    if (rl.nreg > Spr->nreg) {
+        long new_nreg = rl.nreg;
+        // Need to resize all the region related arrays
+        Spr->rlist = (Region) LINT_CAST(realloc((char *) Spr->rlist,
+                                            (unsigned) (new_nreg + 1) * sizeof(region)));
+        if (Spr->rlist == NULL)
+            error("Realloc failed for region list");
+
+        Spr->ctrlist = (float *) LINT_CAST(realloc((char *) Spr->ctrlist,
+                                        (unsigned) (new_nreg + 1) * rl.nbands * sizeof(float)));
+        if (Spr->ctrlist == NULL)
+            error("Realloc failed for centroid list");
+
+        Spr->nnbrlist = (Neighbor) LINT_CAST(realloc((char *) Spr->nnbrlist,
+                                            (unsigned) (new_nreg + 1) * sizeof(neighbor)));
+        if (Spr->nnbrlist == NULL)
+            error("Realloc failed for neighbor list");
+    }
+
     Spr->nreg = rl.nreg;
     Spr->maxreg = rl.nreg;
+    Spr->nbands = rl.nbands;
     size = Spr->nbands * sizeof(float);
 
     for (r = 1; r <= Spr->nreg; r++) {

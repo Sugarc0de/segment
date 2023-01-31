@@ -1,5 +1,3 @@
-#define DEBUG
-
 #ifndef lint
 static char     SCCS_ID[] = "region.c 2.10  9/5/94";
 
@@ -418,6 +416,9 @@ REG_1 Seg_proc  Spr;
      */
     for (r = 1; r <= Spr->maxreg; r++) {
         regid_to_nnbr(Spr, r).nbr_d2 = MAXFLOAT;
+        if (r <= 7000 && r > 5000) {
+            printf("Region %d: nbr_id = %d\n", r, regid_to_nnbr(Spr, r).nbr_id);
+        }
     }
 
     /*
